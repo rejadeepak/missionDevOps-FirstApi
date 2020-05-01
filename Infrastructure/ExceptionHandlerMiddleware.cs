@@ -1,7 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using VSCodeEventBus.Model;
 using System.Net;
 using Newtonsoft.Json;
 
@@ -34,7 +33,7 @@ namespace VSCodeEventBus.Infrastructure
         {
             var apiError = new ApiError()
             {
-                ErrorMessage = $"Error occured during on this path {context.Request.Path}",
+                ErrorMessage =ex.StackTrace,// $"Error occured during on this path {context.Request.Path}",
                 Source = "EventBus",
                 StatusCode = (int)HttpStatusCode.InternalServerError
 

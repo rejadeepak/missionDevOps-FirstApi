@@ -40,6 +40,7 @@ namespace VSCodeEventBus.Domain
 
         modelBuilder.Entity<Customer>(entityTypeBuillder => {
                 entityTypeBuillder.ToTable("Customer").HasKey(customer=>customer.Id);
+                
                 entityTypeBuillder.Property("Id").HasColumnName("StudentId");
                 entityTypeBuillder.Property("Name");
                 entityTypeBuillder.Property("Email");

@@ -1,62 +1,40 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using VSCodeEventBus.Manager;
-using VSCodeEventBus.Model;
-using VSCodeEventBus.Mapper;
 using VSCodeEventBus.DTO;
-using System.Net.Http;
-using VSCodeEventBus.ResourceParameter;
-using VSCodeEventBus.Infrastructure;
+using VSCodeEventBus.Domain;
+using VSCodeEventBus.CQRS;
+using VSCodeEventBus.Controllers.Misc;
 
 namespace VSCodeEventBus.Controllers
 {
     [Route("api/Order")]
     public class OrderController : ControllerBase
     {
-        private readonly IDataStore _dataStore;
-        private readonly OrderMapper _orderMapper;
-        public OrderController(IDataStore dataStore, OrderMapper orderMapper)
+        private readonly Dispatcher _dispatcher;
+        public OrderController(Dispatcher dispatcher)
         {
-            _dataStore = dataStore;
-            _orderMapper = orderMapper;
-        }
-        [HttpGet("api",Name = "Orders")]
-        public async Task<IEnumerable<OrderCommand>> GetOrder() => await Task.FromResult<IEnumerable<OrderCommand>>(_dataStore.GetOrders());
-
-        [HttpGet(Name = "Order")]
-        public async Task<OrderCommand> GetOrder([FromRoute] int orderId)
-        {
-            var order = _dataStore.GetOrders()
-                        .Where(x => x.Id == orderId)
-                        .FirstOrDefault();
-
-            return await Task.FromResult<OrderCommand>(order);
+            _dispatcher = dispatcher;
         }
 
-        [Route("CustomerOrders" , Name = "OrdersByCustomer")]
-        //[OrderConActionFilter]
-        public async Task<IEnumerable<OrderCommand>> GetOrdersByCustomer([FromQuery] OrderParameter orderParameter)
+        [HttpGet("{orderId}", Name = "Order")]
+        public async Task<Order> GetOrder(int orderId)
         {
-            var orders = _dataStore.GetOrders()
-                        .Where(x => x.CustomerId == orderParameter.CustomerId)
-                        .Skip((orderParameter.PageNumber - 1) * orderParameter.PageSize)
-                        .Take(orderParameter.PageSize);
-            return await Task.FromResult<IEnumerable<OrderCommand>>(orders);
-        }
+            var orderQuery = new OrderQuery();
+            orderQuery.orderId = orderId;
+            var order= _dispatcher.Dispatch(orderQuery);
 
+            return await Task.FromResult<Order>(order);
+        }
 
         [HttpPost]
-        public async Task<ActionResult<OrderDto>> AddOrder([FromBody] OrderCommand order)//TODO replace with Command //TODO Make Readonly Property
+        public async Task<IActionResult> AddOrder([FromBody] OrderCommand order)
         {
-            _dataStore.AddOrder(order);
-            var orderDto = _orderMapper.From(order);
-            orderDto.Links = CreateLinksForOrder(orderDto.Id);
-            return await Task.FromResult<OrderDto>(orderDto);
+            var result = _dispatcher.Dispatch(order);
+            return await Task.FromResult<OkObjectResult>(Ok(result));
 
         }
+
 
         private List<Link> CreateLinksForOrder(int orderId)
         {

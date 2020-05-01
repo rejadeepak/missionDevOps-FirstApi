@@ -1,6 +1,6 @@
 using System;
 
-namespace VSCodeEventBus.Model
+namespace  VSCodeEventBus.Infrastructure
 {
     public class ApiError{
 

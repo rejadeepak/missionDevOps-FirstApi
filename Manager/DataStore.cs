@@ -1,8 +1,9 @@
-using VSCodeEventBus.Model;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using VSCodeEventBus.Domain;
+using VSCodeEventBus.Controllers.Misc;
+
 
 namespace VSCodeEventBus.Manager
 {
@@ -10,13 +11,15 @@ namespace VSCodeEventBus.Manager
     public interface IDataStore
     {
         List<Customer> GetCustomers();
-        List<OrderCommand> GetOrders();
 
-        void AddOrder(OrderCommand order);
+        Order GetOrder(int orderId);
+        List<Order> GetOrders();
 
-        void DeleteOrder(OrderCommand order);
+        Result AddOrder(Order order);
 
-        void UpdateOrder(OrderCommand order);
+        void DeleteOrder(Order order);
+
+        void UpdateOrder(Order order);
     }
 
 
@@ -51,10 +54,10 @@ namespace VSCodeEventBus.Manager
 
             return customers;
         }
-        public List<OrderCommand> GetOrders()
+        public List<Order> GetOrders()
         {
-            var orders = new List<OrderCommand>();
-            var order = new OrderCommand()
+            var orders = new List<Order>();
+            var order = new Order()
             {
                 Id = 1,
                 CustomerId = GetCustomers().FirstOrDefault().Id,
@@ -65,7 +68,7 @@ namespace VSCodeEventBus.Manager
             };
 
             orders.Add(order);
-            order = new OrderCommand()
+            order = new Order()
             {
                 Id = 2,
                 CustomerId = GetCustomers().FirstOrDefault().Id,
@@ -76,7 +79,7 @@ namespace VSCodeEventBus.Manager
             };
             orders.Add(order);
 
-            order = new OrderCommand()
+            order = new Order()
             {
                 Id = 3,
                 CustomerId = GetCustomers().FirstOrDefault().Id,
@@ -88,7 +91,7 @@ namespace VSCodeEventBus.Manager
             orders.Add(order);
 
             
-            order = new OrderCommand()
+            order = new Order()
             {
                 Id = 4,
                 CustomerId = GetCustomers().FirstOrDefault().Id,
@@ -103,26 +106,30 @@ namespace VSCodeEventBus.Manager
             return orders;
         }
 
-        public void AddOrder(OrderCommand order)
+        public Result AddOrder(Order order)
         {
             GetOrders().Add(order);
+            return Result.Ok();
         }
 
-        public void DeleteOrder(OrderCommand order)
+        public void DeleteOrder(Order order)
         {
             GetOrders().Remove(order);
 
         }
 
-        public void UpdateOrder(OrderCommand order)
+        public void UpdateOrder(Order order)
         {
-            var selectedOrders = GetOrders().Where(x => x.Id.Equals(order.Id)).FirstOrDefault();
-
+            var selectedOrders = GetOrders().Where(x => x.Id.Equals(order.Id)).FirstOrDefault();            
             if (selectedOrders != null)
             {
-                selectedOrders = order;
-                // GetCustomers().ToList().IndexOf(order);
+                selectedOrders = order;                               
             }
+        }
+
+        public Order GetOrder(int orderId)
+        {
+            return GetOrders().Where(x => x.Id.Equals(orderId)).FirstOrDefault();     
         }
     }
 }

@@ -1,19 +1,22 @@
 
 using System;
-using VSCodeEventBus.DTO;
-using VSCodeEventBus.Model;
+using VSCodeEventBus.CQRS;
+using VSCodeEventBus.Domain;
+
 namespace VSCodeEventBus.Mapper
 {
-    public class OrderMapper
+    public class OrderMapper :IOrderMapper
     {
 
         public OrderMapper()
         {
 
         }
-        public OrderDto From(OrderCommand order)
-        {
-            return new OrderDto()
+
+
+        public Order Map(OrderCommand order)
+        {            
+            return new Order()
             {
                 Id = order.Id,
                 OrderDate = order.OrderDate,
@@ -24,5 +27,6 @@ namespace VSCodeEventBus.Mapper
             };
         }
 
+       
     }
 }
