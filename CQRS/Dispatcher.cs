@@ -28,9 +28,8 @@ namespace VSCodeEventBus.CQRS
 
             dynamic queryhandler = _provider.GetService(queryHandlerType);
             return queryhandler.Handle((dynamic)query);
-        }
-
-        //services.AddScoped<ICommandHandler<OrderCommand>,OrderCommandHandler>();
+        } 
+              
         public Result Dispatch(ICommand command)
         {
             var commandHandlerType = typeof(ICommandHandler<>);

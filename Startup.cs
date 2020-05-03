@@ -16,7 +16,8 @@ using VSCodeEventBus.Infrastructure;
 using VSCodeEventBus.Domain;
 using VSCodeEventBus.CQRS;
 using Microsoft.OpenApi.Models;
-
+using VSCodeEventBus.VSCodeEventBus;
+using VSCodeEventBus.Handlers;
 
 namespace VSCodeEventBus
 {
@@ -37,9 +38,23 @@ namespace VSCodeEventBus
             services.AddScoped<IDataStore, DataStore>();
             services.AddScoped<IOrderMapper, OrderMapper>();
             services.AddDbContext<OrderContext>();
+
             services.AddScoped<IQueryHandler<OrderQuery, Order>, OrderQueryHandler>();
             services.AddScoped<ICommandHandler<OrderCommand>, OrderCommandHandler>();
+
             services.AddScoped<Dispatcher>();
+
+            services.AddSingleton<IPublishManager, PublishManager>();
+            services.AddSingleton<ISubscriptionManager, SubscriptionManager>();
+            services.AddSingleton<IPubSubEventBus, PubSubEventBus>();
+            services.AddSingleton<IProcessManager, ProcessManager>();
+            services.AddSingleton<OrderRetrieveEventHandler>();
+
+            // var provider = services.BuildServiceProvider();
+            // var eventBus = provider.GetRequiredService<IPubSubEventBus>();
+            // eventBus.Subscribe<OrderRetrieveEvent,OrderRetrieveEventHandler>();
+
+           
 
             services.AddSwaggerGen(c =>
             {
@@ -55,6 +70,7 @@ namespace VSCodeEventBus
         {
             app.UseSwagger();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
+            //app.UseMiddleware<EventBusSunscriptionMiddleware>();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
@@ -77,3 +93,7 @@ namespace VSCodeEventBus
         }
     }
 }
+
+
+
+           
