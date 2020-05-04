@@ -5,6 +5,7 @@ using VSCodeEventBus.DTO;
 using VSCodeEventBus.Domain;
 using VSCodeEventBus.CQRS;
 using VSCodeEventBus.Controllers.Misc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VSCodeEventBus.Controllers
 {
@@ -16,7 +17,7 @@ namespace VSCodeEventBus.Controllers
         {
             _dispatcher = dispatcher;
         }
-
+        [Authorize]
         [HttpGet("{orderId}", Name = "Order")]
         public async Task<Order> GetOrder(int orderId)
         {

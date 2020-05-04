@@ -18,6 +18,8 @@ using VSCodeEventBus.CQRS;
 using Microsoft.OpenApi.Models;
 using VSCodeEventBus.VSCodeEventBus;
 using VSCodeEventBus.Handlers;
+using IdentityServer4;
+using IdentityModel;
 
 namespace VSCodeEventBus
 {
@@ -49,16 +51,19 @@ namespace VSCodeEventBus
             services.AddSingleton<IPubSubEventBus, PubSubEventBus>();
             services.AddSingleton<IProcessManager, ProcessManager>();
             services.AddSingleton<OrderRetrieveEventHandler>();
+            services.AddHttpClient();
 
-            // var provider = services.BuildServiceProvider();
-            // var eventBus = provider.GetRequiredService<IPubSubEventBus>();
-            // eventBus.Subscribe<OrderRetrieveEvent,OrderRetrieveEventHandler>();
-
+            services.AddAuthentication("Bearer")
+            .AddJwtBearer("Bearer",(options)=>
+                            {
+                                options.Audience="EventBus";
+                                options.RequireHttpsMetadata = false;
+                                options.Authority="https://localhost:8000";
+                            });
            
-
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "EventBus API", Version = "v1" });
             });
 
 
@@ -70,25 +75,23 @@ namespace VSCodeEventBus
         {
             app.UseSwagger();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
+
             //app.UseMiddleware<EventBusSunscriptionMiddleware>();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "EventBus API ");
                 c.RoutePrefix = string.Empty;
             });
 
 
-            // if (env.IsDevelopment())
-            // {
-            //     app.UseDeveloperExceptionPage();
-            // }
-            // else
-            // {
-            //     app.UseDeveloperExceptionPage();
-            //     app.UseHsts();
-            // }
+            if (!env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseHsts();
+            }
 
-            // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
