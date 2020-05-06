@@ -17,7 +17,7 @@ namespace VSCodeEventBus.Controllers
         {
             _dispatcher = dispatcher;
         }
-        [Authorize]
+        //[Authorize]
         [HttpGet("{orderId}", Name = "Order")]
         public async Task<Order> GetOrder(int orderId)
         {

@@ -21,6 +21,7 @@ using VSCodeEventBus.Handlers;
 using IdentityServer4;
 using IdentityModel;
 
+
 namespace VSCodeEventBus
 {
     public class Startup
@@ -51,15 +52,16 @@ namespace VSCodeEventBus
             services.AddSingleton<IPubSubEventBus, PubSubEventBus>();
             services.AddSingleton<IProcessManager, ProcessManager>();
             services.AddSingleton<OrderRetrieveEventHandler>();
+         
             services.AddHttpClient();
 
-            services.AddAuthentication("Bearer")
-            .AddJwtBearer("Bearer",(options)=>
-                            {
-                                options.Audience="EventBus";
-                                options.RequireHttpsMetadata = false;
-                                options.Authority="https://localhost:8000";
-                            });
+            // services.AddAuthentication("Bearer")
+            // .AddJwtBearer("Bearer",(options)=>
+            //                 {
+            //                     options.Audience="EventBus";
+            //                     options.RequireHttpsMetadata = false;
+            //                     options.Authority="https://localhost:8000";
+            //                 });
            
             services.AddSwaggerGen(c =>
             {
@@ -91,7 +93,7 @@ namespace VSCodeEventBus
             }
 
             app.UseHttpsRedirection();
-            app.UseAuthentication();
+           // app.UseAuthentication();
             app.UseMvc();
         }
     }
